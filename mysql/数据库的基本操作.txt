@@ -1,0 +1,375 @@
+数据库的基本操作：
+1、数据库和数据对象基本概念
+    数据库：  数据库是存储数据库对象的容器。
+    数据库对象：  是指存储、管理和使用数据的不同结构形式，主要包含表、视图、存储过程、函数、触发器和事务。
+    什么是关系型数据库？  关系型数据库以行和列的形式存储数据，这一系列的行和列被称为表，一组表组成的数据库。
+2、创建数据库
+    语法格式：create database 数据库名；
+    数据库命名规则：  (1)数据库不能与已经存在的数据库重名。(2)首字母不能是数字和$符。
+    查看和选择数据库：(1)查看数据库语句：show databases;   (2)选择数据库语句：use 数据库名。
+3、删除数据库
+    语法格式：drop database 数据库名；
+4、表的操作
+    (1)表的基本概念：数据在表中的组织方式与在电子表格中相似，都是按行和列的格式组织的
+    记录：表中一行数据代表一个记录
+    字段：记录中的每一列代表一个字段
+    (2)创建表：创建表的语法格式：create table table_name
+                                    (
+                                        字段1  数据类型1,
+                                        字段2  数据类型2,
+                                        字段3  数据类型3,
+                                        .
+                                        .
+                                        字段n  数据类型n
+                                    );
+        注意：各列之间用逗号隔开。
+    (3)查看表结构： desc 表名;  作用：查看表定义。  
+                    show create table 表名;   作用：查看表详细定义。
+    (4)删除表：     drop table 表名;
+
+    (5)修改表名:    alter table 旧表名 rename 新表名;
+
+    (6) 增加字段:   a、在表的最后一个位置增加字段：
+                        alter table tb_name add 字段名 数据类型;
+                    b、在表的第一个位置增加字段：
+                        alter table tb_name add 字段名 数据类型 first;      
+                    c、在表的指定字段之后增加字段：
+                        alter table tb_name add 字段名 数据类型 after 指定字段;     
+
+    (7) 删除字段：  alter table tb_name drop 属性名;
+
+    (8) 修改字段:   a、修改字段的数据类型：
+                        alter table tb_name modify 字段名 数据类型; 
+                    b、修改字段的名字：
+                        alter table tb_name change 旧字段名 新字段名 新数据类型;
+
+5、数据的操作
+    (1)插入数据记录:    a、插入完整数据记录
+                            insert into tb_name value(var1,var2,...varN);
+                        b、插入数据记录的一部分
+                            insert into tb_name(字段1，字段2，字段3,...字段N)
+                            values(var1,var2,var3,...varN);
+                            属性和var要一一对应;
+                        c、插入多条数据记录
+                            insert into tb_name value(记录1),(记录2),(记录3);
+
+    (2)更新数据记录：   a、更新特定数据记录
+                            update tb_name
+                                set 字段名1=数值1,
+                                    字段名2=数值2,
+                                    字段名3=数值3,
+                                where condition
+            update tb_affiche set title = 'xiu' ,content = 'gai' where id = 54;                 
+                            
+    (3)删除数据记录：   a、删除特定的数据记录
+                            delete from tb_name where 特定条件;
+
+6、完整性约束：完整性约束是对字段进行限制，从而符合该字段达到我们期望的效果。
+               比如字段含有默认值，不能是NULL等
+               如果插入的数据不满足限制要求，数据库管理系统就拒绝执行操作。
+                a、非空性 - not null
+                    create table tb_student_info
+                     (
+                        pID int,
+                        Name varchar(50) not null,
+                        Age tinyint
+                     ); 
+
+                     insert into tb_student_info(pID,Name,age) value(1,'fuchuan',20);               
+                b、唯一性 - unique  :唯一性是指表中该字段的值不能重复出现，
+                    create table tb_student_info1
+                     (
+                        pID int unique,
+                        Name varchar(50),
+                        Age tinyint
+                     ); 
+
+                     insert into tb_student_info1(pID,Name,age) value(1,'fuchuan',20);
+
+7、默认值：
+            create table tb_student_info3
+                (
+                    pID int,
+                    Name varchar(50),
+                    Age tinyint default 20
+                );  
+
+8、主键 - primary key
+        主键 = 非空 + 唯一
+        主键能够标识表中每条信息的唯一性，如同身份证号码和人的关系人可以同名，但是身份证号码却是唯一的，创建主键的目的在于快速查找到表中的某一条信息。
+        a、单字段主键
+            create table stu7
+                (
+                    Id int primary key,
+                    Name varchar(40),
+                    Height int default 180
+                );
+        b、多字段主键
+            create table stu8
+                (
+                    Id int,
+                    Name varchar(40),
+                    Height int default 180,
+                    primary key(Id,Name)    #多字段主键
+                );
+
+    动态添加：  alter table stu7 add primary key(id);
+    动态删除：  alter table stu7 drop primary key;
+
+9、自增性 - auto_increment
+        auto_increment主要用于为表中插入的新纪录自动生成唯一的ID
+        一个表只能有一个字段使用自增性约束，
+        并且该字段必须为主键的一部分，
+        该字段的数据类型必须是整形;
+        create table stu10
+            (
+                id int primary key auto_increment,
+                name varchar(40),
+                height int default 180
+            );
+        insert into stu10 value(1,'蒋方舟',198);
+        insert into stu10(name,height) value('pengfuchaun',198);
+        insert into stu10(name,height) value('huangguanying',198);
+
+10、外键 - foreign key
+    表的外键与主键是相对应的，比如A表中的id是外键，B表中的id是主键，那么就可以称B表为父表，A表为子表。设置外键的目的在于保证表的完整性
+    A.创建表时，添加外键
+    create table student1
+        (
+            id int,
+            course_id int,
+            teacher varchar(20),
+            constraint fk foreign key(id)
+            references student2(id)
+        );
+    B.动态添加：alter table student1 add constraint fk foreign key(id)
+                references student2(id);
+
+                student1:子表
+                fk：外键别名
+                student2：父表
+
+      动态删除：alter table student1 drop foreign key fk;
+
+    delete restrict - 限制删除
+        1.增加外键：alter table son add constraint fk foreign key(pid)
+                    references father(pid) on delete restrict;
+        2.删除父表的记录：delete from father where 特定条件;
+
+    delete cascade - 级联删除
+        1.先删除外键
+        2.在添加外键
+        alter table son add constraint fk foreign key(pid)
+        references father(pid) on delete cascade;
+例题：
+create table father
+    (
+        pid int primary key,
+        name varchar(40)
+    );
+create table son
+    (
+        id int,
+        pid int,
+        name varchar(40)
+    );
+insert into father value(1,'老布什');,(2,'胡耀邦');
+insert into son value(1001,1,'小布什');,(1002,2,'胡德平');
+//限制删除
+alter table son add constraint fk foreign key(pid)
+references father(pid) on delete restrict;
+//级联删除
+alter table son add constraint fk foreign key(pid)
+references father(pid) on delete cascade;
+//删除外键
+alter table son drop foreign key fk;
+//删除父表的记录
+delete from father where pid=2;
+
+
+11、select 字段名1,字段名2,...,字段n
+            from 表名 where 条件;
+
+    a、not null
+        select *from members where depid is not null
+        select *from members where depid is null
+
+    b、limit 控制查询语句
+        select *from members limit 0,2;
+        //第一个参数：记录起始的位置
+        //第二个参数：表示查询的记录数
+
+    c、in   在集合里面
+        select *from members where mid in(1,6,7);
+        select *from members where (mid=1) or (mid=6) or (mid=7);
+        and,or,not,&&,||,!,>,<,=,>=,<=,+,-,*,/;
+        select *from salary where srest >= 5000 && srest <= 100000;
+
+    d、between and 区间查询
+        select *from members where mid between 1 and 4;
+        select *from members where (mid >= 1)&&(mid <= 4);
+
+    e、like 模糊查询
+        %:可以匹配任意长度的字符串;
+        _:能匹配单个字符;
+
+        %%:代表查询所有数据;
+        select *from salary where note like'_收入';
+        select *from salary where 字段名 like'%斯%';
+
+    f、distinct 去除重复
+        select depid from members;
+        select distinct depid from members;
+
+    g、order by - 排序(升序 asc, 降序 desc) 
+        单字段排序：
+            按工资升序排序
+            select *from salary order by srest asc;
+            按工资降序排序
+            select *from salary order by srest desc;
+
+    h、group by - 分组查询
+        select *from members group by depid;
+        select group_concat(mid),mname from members group by depid; 
+        group_concat(字段名):将该字段名下的值都显示出来;
+        select group_concat(mid) as 编号,group_concat(mname) as 姓名,depid from members group by depid;
+
+        count():统计记录个数;
+        avg():统计字段的平均值;
+        sum():统计字段的总和;
+        max():统计字段的最大值;
+        min():统计字段的最小值;
+        统计函数时和分组一起用;
+        select sid,count(srest) as 人数,avg(srest) as 平均工资,max(srest) as 最高工资 from salary group by mid;
+
+    i、group_concat vs concat
+    group_concat:   用于显示分组后的所有数据
+          concat:   连接字符串
+    select concat('部门编号--',depid) as 编号 from members group by depid;
+
+    j、内连接 = 左连接 与 右连接的 交集
+        select 字段1 ... 字段n
+        from 表1 as 别名1 inner join 表2 as 别名2 on 条件;
+        select m.mname,s.srest,s.note
+        from members as m inner join salary as s on m.mid = s.mid;
+
+    k、左连接
+        select
+    L、右连接
+
+12、子查询
+    a、where子查询
+        where型的子查询就是把内层查询的结果当作外层查询的条件。
+
+        1.select mid from salary where srest >= 5000;
+       *2.select mname from members where mid in
+          (select mid from salary where srest >= 5000);
+
+    b、from子查询
+        from子查询就是把子查询的结果(内存里的一张表)当作一张临时表，然后再对它进行处理
+        select tmp.mid from (select *from salary where srest = 5000) as tmp;
+
+    c、exists子查询
+        exists子查询就是对外层表进行循环，再对内层表进行内存查询
+        select *from tb_team as t where not exists(
+        select *from tb_playr where team = t.name);
+
+        查询members表里面的成员，这些成员的depid存在于与depart表
+        select *from members as m where exists(
+        select *from depart where depid = m.depid);
+        查询members表里面的成员，这些成员的depid不存在于depart表
+        select *from members as m where not exists(
+        select *from depart where depid = m.depid);
+
+
+
+
+
+
+
+
+select group_concat(mid) as 编号,group_concat(mname) as 姓名,depid from members group by depid;
+
+insert into salary value(10,6,450,'中产阶级'),(11,6,480,'中产阶级'),(12,7,58000,'土豪'),
+(13,7,68000,'土豪');
+
+select sid,count(srest) as 人数,avg(srest) as 平均工资,max(srest) as 最高工资 from salary group by mid;
+
+select  m.mname,s.srest 
+from members as m inner join salary as s on s.srest >= 5000 && m.mid = s.mid;
+
+
+
+
+create table depart
+    (
+        depId int primary key,
+        depName varchar(40)
+    );
+insert into depart value(1001,'计算机'),(1002,'商务英语'),
+(1003,'信息工程'),(1004,'会计');
+
+create table members
+    (
+        mId int,
+        mName varchar(40),
+        mSex varchar(40),
+        depId int
+    );
+
+insert into members values(1,'李四','男',1001),(2,'谢婷','女',1002),(3,'王凯','男',1001),(4,'张明','男',1001),(5,'魏碧波','男',0);
+insert into members(mId,mName,mSex) values(6,'孟非','男'),(7,'乐嘉','男');
+
+create table salary
+    (
+        sId int primary key,
+        mId int,
+        sRest decimal(10,2),
+        note varchar(50)
+    );
+
+insert into salary values(1,1,2000.00,'低收入'),(2,2,5000.00,'中产阶级'),
+(3,3,3000.00,'低收入'),(4,4,4000.00,'中产阶级'),(5,5,1000.00,'低收入'),
+(6,6,50000.00,'高收入'),(7,7,100000.00,'土豪');
+
+alter table members modify mSex varchar(2); 
+
+
+
+
+
+
+
+
+create table tb_person(
+    id tinyint,
+    name varchar(50),
+    height int,
+    school varchar(100)
+    );
+
+insert into tb_person value(1,'马云','175','杭州师范');
+insert into tb_person value(2,'奶茶妹','168','北京大学');
+insert into tb_person value(3,'蒋方舟','165','清华大学');
+
+insert into tb_person(name,school) value(kobe,'高中');
+
+insert into tb_name value(6,'乔丹',198,'北卡'),(7,'雷军',178,'武汉大学');
+
+update tb_company
+    set cType = '网络设备',
+        CEO = '任正非',
+        Scale = '50000以上'
+    where cId = 5;
+
+delete from tb_person where id=2;
+
+insert into tb_company value
+    (1,'腾讯','互联网','10000以上','马化腾',30,10),
+    (2,'阿里巴巴','传统行业','10000以上','马云',640,56),
+    (3,'京东','互联网','5000以上','刘强东',65,23),
+    (4,'哇哈哈','传统行业','3000以上','宗庆后',45,15),
+    (5,'华为','互联网','10000以上','余城东',5000,1200);
+
+insert into tb_company value(1,'腾讯','互联网','10000以上','马化腾',30,10);
+
